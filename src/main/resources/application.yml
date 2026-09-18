@@ -1,3 +1,9 @@
 spring:
   main:
     web-application-type: none
+
+auth:
+  key: ${AUTH_KEY}
+
+gigachat:
+  auth-url: https://ngw.devices.sberbank.ru:9443

@@ -19,6 +19,9 @@ repositories {
 }
 
 dependencies {
+    //omg, giga-something
+    implementation("chat.giga:gigachat-java:0.1.18")
+
     implementation("org.springframework.boot:spring-boot-starter-kafka")
     implementation("org.springframework.boot:spring-boot-starter-webmvc")
     compileOnly("org.projectlombok:lombok")
