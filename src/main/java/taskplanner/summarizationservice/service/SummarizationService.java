@@ -8,10 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import taskplanner.summarizationservice.dto.TaskResponse;
 import taskplanner.summarizationservice.dto.TaskStatus;
-import taskplanner.summarizationservice.dto.UserTasks;
+import taskplanner.summarizationservice.dto.SummarizationRequest;
 import taskplanner.summarizationservice.dto.gigachat.ChatRequest;
 import taskplanner.summarizationservice.dto.gigachat.Content;
 import taskplanner.summarizationservice.dto.gigachat.Message;
+import taskplanner.summarizationservice.response.SummaryResponse;
 import taskplanner.summarizationservice.response.TokenResponse;
 import taskplanner.summarizationservice.response.gigachat.ChatResponse;
 import tools.jackson.databind.ObjectMapper;
@@ -30,12 +31,7 @@ public class SummarizationService {
     private final ObjectMapper objectMapper;
     private final RestClient restClient;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void testReport() {
-        getSummary();
-    }
-
-    private UserTasks userTasks = new UserTasks(
+    private SummarizationRequest userTasks = new SummarizationRequest(
             List.of(
                     new TaskResponse(
                             "Изучить GigaChat API",
@@ -66,7 +62,7 @@ public class SummarizationService {
             )
     );
 
-    public void getSummary() {
+    public SummaryResponse getSummary(SummarizationRequest dto) {
         String json = objectMapper.writeValueAsString(userTasks);
 
         String prompt = """
@@ -93,6 +89,7 @@ public class SummarizationService {
                         )
                 )
         );
+        //toDo пихануть в Промтп-класс
 
         TokenResponse token = tokenService.getValidToken();
 
@@ -112,5 +109,7 @@ public class SummarizationService {
                 "GigaChat summary received successfully: body={}",
                 body
         );
+
+        return new SummaryResponse(body.messages().toString());
     }
 }
