@@ -1,13 +1,9 @@
 package taskplanner.summarizationservice.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import taskplanner.summarizationservice.dto.TaskResponse;
-import taskplanner.summarizationservice.dto.TaskStatus;
 import taskplanner.summarizationservice.dto.SummarizationRequest;
 import taskplanner.summarizationservice.dto.gigachat.ChatRequest;
 import taskplanner.summarizationservice.dto.gigachat.Content;
@@ -15,89 +11,40 @@ import taskplanner.summarizationservice.dto.gigachat.Message;
 import taskplanner.summarizationservice.response.SummaryResponse;
 import taskplanner.summarizationservice.response.TokenResponse;
 import taskplanner.summarizationservice.response.gigachat.ChatResponse;
-import tools.jackson.databind.ObjectMapper;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
-import static taskplanner.summarizationservice.service.Prompt.SYSTEM_PROMPT;
-
 @Slf4j
-@RequiredArgsConstructor
 @Service
 public class SummarizationService {
 
-    private final TokenService tokenService;
-    private final ObjectMapper objectMapper;
-    private final RestClient restClient;
+    private static final String AI_MODEL = "GigaChat-2";
+    private static final String SYSTEM_ROLE = "system";
+    private static final String USER_ROLE = "user";
 
-    private SummarizationRequest userTasks = new SummarizationRequest(
-            List.of(
-                    new TaskResponse(
-                            "Изучить GigaChat API",
-                            "Разобраться с OAuth и получить access token",
-                            TaskStatus.FINISHED,
-                            OffsetDateTime.parse("2026-09-18T10:30:00Z")
-                    ),
-                    new TaskResponse(
-                            "Проверить первый summary",
-                            "Отправить тестовые данные в GigaChat и получить отчёт",
-                            TaskStatus.FINISHED,
-                            OffsetDateTime.parse("2026-09-18T18:15:00Z")
-                    )
-            ),
-            List.of(
-                    new TaskResponse(
-                            "Написать Summarization",
-                            "Сделать интеграцию с GigaChat",
-                            TaskStatus.CREATED,
-                            null
-                    ),
-                    new TaskResponse(
-                            "Настроить Kafka RPC",
-                            "Сделать request/reply между Scheduler и Summarization",
-                            TaskStatus.IN_PROCESS,
-                            null
-                    )
-            )
-    );
+    private final TokenService tokenService;
+    private final RestClient restClient;
+    private final PromptProcessor promptProcessor;
+
+    public SummarizationService(TokenService tokenService,
+                                @Qualifier("gigaChatRestClient")
+                                RestClient restClient,
+                                PromptProcessor promptProcessor) {
+        this.tokenService = tokenService;
+        this.restClient = restClient;
+        this.promptProcessor = promptProcessor;
+    }
 
     public SummaryResponse getSummary(SummarizationRequest dto) {
-        String json = objectMapper.writeValueAsString(userTasks);
+        String userPrompt = promptProcessor.buildUserPrompt(dto);
+        String systemPrompt = promptProcessor.buildSystemPrompt();
 
-        String prompt = """
-                Период: 17.09.2026 - 18.09.2026
-
-                Данные пользователя:
-                %s
-                """.formatted(json); //""".formatted(from, to, json); //пощзже, когда придут инстанты
-
-        ChatRequest chatRequest = new ChatRequest(
-                "GigaChat-2", //GigaChat-2-Max
-                List.of(
-                        new Message(
-                                "system",
-                                List.of(
-                                        new Content(SYSTEM_PROMPT)
-                                )
-                        ),
-                        new Message(
-                                "user",
-                                List.of(
-                                        new Content(prompt)
-                                )
-                        )
-                )
-        );
-        //toDo пихануть в Промтп-класс
+        ChatRequest chatRequest = buildChatRequest(systemPrompt, userPrompt);
 
         TokenResponse token = tokenService.getValidToken();
 
         ChatResponse body = restClient.post()
-                .uri(
-                        "https://api.giga.chat/v2/chat/completions" //hardcode
-
-                )
+                .uri("/v2/chat/completions")
                 .header("Content-Type", "application/json")
                 .header("Accept", "application/json")
                 .header("Authorization", "Bearer " + token.accessToken())
@@ -111,5 +58,25 @@ public class SummarizationService {
         );
 
         return new SummaryResponse(body.messages().toString());
+    }
+
+    private static ChatRequest buildChatRequest(String systemPrompt, String userPrompt) {
+        return new ChatRequest(
+                AI_MODEL,
+                List.of(
+                        new Message(
+                                SYSTEM_ROLE,
+                                List.of(
+                                        new Content(systemPrompt)
+                                )
+                        ),
+                        new Message(
+                                USER_ROLE,
+                                List.of(
+                                        new Content(userPrompt)
+                                )
+                        )
+                )
+        );
     }
 }

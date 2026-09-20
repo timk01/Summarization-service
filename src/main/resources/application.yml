@@ -2,8 +2,13 @@ spring:
   main:
     web-application-type: none
 
+  kafka:
+    consumer:
+      group-id: summarization-service-group
+
 auth:
   key: ${AUTH_KEY}
 
 gigachat:
   auth-url: https://ngw.devices.sberbank.ru:9443
+  api-url: https://api.giga.chat

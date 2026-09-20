@@ -2,6 +2,7 @@ package taskplanner.summarizationservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
@@ -21,6 +22,13 @@ public class TokenService {
 
     private final RestClient restClient;
     private final Clock clock;
+
+    public TokenService(@Qualifier("tokenRestClient")
+                        RestClient restClient,
+                        Clock clock) {
+        this.restClient = restClient;
+        this.clock = clock;
+    }
 
     @Value("${auth.key}")
     private String authKey;
@@ -51,10 +59,7 @@ public class TokenService {
 
     private TokenResponse requestToken() {
         TokenResponse renewToken = restClient.post()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/api/v2/oauth")
-                        .build()
-                )
+                .uri("/api/v2/oauth")
                 .header("Content-Type", "application/x-www-form-urlencoded")
                 .header("Accept", "application/json")
                 .header("RqUID", UUID.randomUUID().toString())
