@@ -1,4 +1,4 @@
-package taskplanner.summarizationservice.response;
+package taskplanner.summarizationservice.dto.token;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.stereotype.Service;
-import taskplanner.summarizationservice.dto.SummarizationRequest;
-import taskplanner.summarizationservice.response.SummaryResponse;
+import taskplanner.summarizationservice.dto.summarizattion.request.SummarizationRequest;
+import taskplanner.summarizationservice.dto.summarizattion.response.SummarizationResponse;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -17,7 +17,7 @@ public class KafkaService {
 
     @SendTo
     @KafkaListener(topics = KafkaTopics.SUMMARIZATION_REQUESTS)
-    public SummaryResponse consume(SummarizationRequest dto) {
+    public SummarizationResponse consume(SummarizationRequest dto) {
         log.info("received data for summarization");
 
         return summarizationService.getSummary(dto);

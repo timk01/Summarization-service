@@ -1,14 +1,14 @@
-package taskplanner.summarizationservice.dto;
+package taskplanner.summarizationservice.dto.summarizattion.request;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 import java.time.OffsetDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public record TaskResponse(
+public record TaskRequest(
         String header,
         String text,
-        TaskStatus status,
+        TaskStatusRequestEnum status,
         OffsetDateTime finishedAt
 ) {
 }

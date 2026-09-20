@@ -3,7 +3,7 @@ package taskplanner.summarizationservice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import taskplanner.summarizationservice.config.SummarizationMainConfig;
-import taskplanner.summarizationservice.dto.SummarizationRequest;
+import taskplanner.summarizationservice.dto.summarizattion.request.SummarizationRequest;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.ObjectMapper;
 

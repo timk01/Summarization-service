@@ -1,4 +1,4 @@
-package taskplanner.summarizationservice.dto.gigachat;
+package taskplanner.summarizationservice.dto.gigachat.request;
 
 import java.util.List;
 

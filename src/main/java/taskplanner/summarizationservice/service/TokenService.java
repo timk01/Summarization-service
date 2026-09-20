@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClient;
-import taskplanner.summarizationservice.response.TokenResponse;
+import taskplanner.summarizationservice.dto.token.TokenResponse;
 
 import java.time.Clock;
 import java.util.UUID;

@@ -4,13 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import taskplanner.summarizationservice.dto.SummarizationRequest;
-import taskplanner.summarizationservice.dto.gigachat.ChatRequest;
-import taskplanner.summarizationservice.dto.gigachat.Content;
-import taskplanner.summarizationservice.dto.gigachat.Message;
-import taskplanner.summarizationservice.response.SummaryResponse;
-import taskplanner.summarizationservice.response.TokenResponse;
-import taskplanner.summarizationservice.response.gigachat.ChatResponse;
+import taskplanner.summarizationservice.dto.summarizattion.request.SummarizationRequest;
+import taskplanner.summarizationservice.dto.gigachat.request.ChatRequest;
+import taskplanner.summarizationservice.dto.gigachat.request.Content;
+import taskplanner.summarizationservice.dto.gigachat.request.Message;
+import taskplanner.summarizationservice.dto.summarizattion.response.SummarizationResponse;
+import taskplanner.summarizationservice.dto.token.TokenResponse;
+import taskplanner.summarizationservice.dto.gigachat.response.ChatResponse;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class SummarizationService {
         this.promptProcessor = promptProcessor;
     }
 
-    public SummaryResponse getSummary(SummarizationRequest dto) {
+    public SummarizationResponse getSummary(SummarizationRequest dto) {
         String userPrompt = promptProcessor.buildUserPrompt(dto);
         String systemPrompt = promptProcessor.buildSystemPrompt();
 
@@ -57,7 +57,7 @@ public class SummarizationService {
                 body
         );
 
-        return new SummaryResponse(body.messages().toString());
+        return new SummarizationResponse(body.messages().toString());
     }
 
     private static ChatRequest buildChatRequest(String systemPrompt, String userPrompt) {
