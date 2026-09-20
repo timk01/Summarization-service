@@ -3,8 +3,21 @@ spring:
     web-application-type: none
 
   kafka:
+    bootstrap-servers: localhost:9092
+
     consumer:
       group-id: summarization-service-group
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
+      properties:
+        spring.json.value.default.type: taskplanner.summarizationservice.dto.summarizattion.request.SummarizationRequest
+        spring.json.trusted.packages: taskplanner.summarizationservice.dto.summarizattion.request
+        spring.json.use.type.headers: false
+
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JacksonJsonSerializer
 
 auth:
   key: ${AUTH_KEY}

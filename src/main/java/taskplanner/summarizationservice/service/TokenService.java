@@ -14,7 +14,6 @@ import java.time.Clock;
 import java.util.UUID;
 
 @Slf4j
-@RequiredArgsConstructor
 @Service
 public class TokenService {
 
@@ -23,17 +22,17 @@ public class TokenService {
     private final RestClient restClient;
     private final Clock clock;
 
+    @Value("${auth.key}")
+    private String authKey;
+
+    private TokenResponse token;
+
     public TokenService(@Qualifier("tokenRestClient")
                         RestClient restClient,
                         Clock clock) {
         this.restClient = restClient;
         this.clock = clock;
     }
-
-    @Value("${auth.key}")
-    private String authKey;
-
-    private TokenResponse token;
 
     public synchronized TokenResponse getValidToken() {
         if (token == null || shouldRefreshToken()) {
