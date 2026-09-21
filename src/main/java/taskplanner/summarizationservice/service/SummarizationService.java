@@ -57,10 +57,10 @@ public class SummarizationService {
                 body
         );
 
-        return new SummarizationResponse(body.messages().toString());
+        return new SummarizationResponse(body.messages().getFirst().content().getFirst().text());
     }
 
-    private static ChatRequest buildChatRequest(String systemPrompt, String userPrompt) {
+    private ChatRequest buildChatRequest(String systemPrompt, String userPrompt) {
         return new ChatRequest(
                 AI_MODEL,
                 List.of(
