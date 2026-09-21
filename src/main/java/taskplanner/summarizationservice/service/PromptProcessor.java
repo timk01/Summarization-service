@@ -1,21 +1,18 @@
 package taskplanner.summarizationservice.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import taskplanner.summarizationservice.config.SummarizationMainConfig;
 import taskplanner.summarizationservice.dto.summarizattion.request.SummarizationRequest;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.ObjectMapper;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
 @Component
 public class PromptProcessor {
 
-    private static final DateTimeFormatter DATE_FORMATTER
-            = DateTimeFormatter.ofPattern("dd.MM.yyyy").withZone(ZoneId.of(SummarizationMainConfig.TIME_ZONE));
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy.MM.dd HH:mm").withZone(ZoneId.of(SummarizationMainConfig.TIME_ZONE));
 
     private static final String SYSTEM_PROMPT = """
             Сформируй краткий ежедневный отчёт пользователя
@@ -25,7 +22,7 @@ public class PromptProcessor {
             отсутствующие во входных данных.
 
             Для завершённых задач указывай время завершения
-            в формате YYYY.MM.DD HH:MM, например: 2026.09.18 10:30.
+            в формате YYYY.MM.DD HH:MM. например: 2026.09.18 10:30.
 
             Для незавершённых задач указывай текущий статус,
             если он предоставлен.
@@ -48,11 +45,11 @@ public class PromptProcessor {
             Период: 18.09.2026 - 19.09.2026
 
             finishedTasks:
-            - Починить кран | Срочно | FINISHED | 2026-09-18T09:15:00Z
+            - Починить кран ___ Срочно ___ FINISHED ___ 2026.09.18 10:30
 
             unfinishedTasks:
-            - Сходить в магазин | Купить продукты | IN_PROCESS
-            - Отправить письмо | Подготовить и отправить письмо | CREATED
+            - Сходить в магазин ___ Купить продукты ___ IN_PROCESS
+            - Отправить письмо ___ Подготовить и отправить письмо ___ CREATED
 
             Пример правильного отчёта:
 
@@ -60,7 +57,7 @@ public class PromptProcessor {
             18.09.2026 - 19.09.2026
 
             Завершённые задачи:
-            1. Починить кран. Срочно. 2026.09.18 09:15
+            1. Починить кран. Срочно. 2026.09.18 10:30
 
             Незавершённые задачи:
             1. Сходить в магазин. Купить продукты. IN_PROCESS
@@ -70,25 +67,45 @@ public class PromptProcessor {
             Не добавляй служебные символы, JSON-разметку или комментарии.
             """;
 
-    private final ObjectMapper objectMapper;
-
     public String buildUserPrompt(SummarizationRequest request) {
-        try {
-            String json = objectMapper.writeValueAsString(request);
+        String finishedTasks = prepareFinishedTasks(request);
+        String unfinishedTasks = prepareUnfinishedTasks(request);
 
-            return """
-                    Период: %s - %s
+        return """
+                Период: %s - %s
 
-                    Данные пользователя:
-                    %s
-                    """.formatted(
-                    DATE_FORMATTER.format(request.from()),
-                    DATE_FORMATTER.format(request.to()),
-                    json
-            );
-        } catch (JacksonException e) {
-            throw new RuntimeException(e);
-        }
+                finishedTasks:
+                %s
+
+                unfinishedTasks:
+                %s
+                """.formatted(
+                DATE_TIME_FORMATTER.format(request.from()),
+                DATE_TIME_FORMATTER.format(request.to()),
+                finishedTasks,
+                unfinishedTasks
+        );
+    }
+
+    private String prepareFinishedTasks(SummarizationRequest request) {
+        return request.finishedTasks().stream()
+                .map(task -> "- %s ___ %s ___ %s ___ %s".formatted(
+                        task.header(),
+                        task.text(),
+                        task.status(),
+                        DATE_TIME_FORMATTER.format(task.finishedAt().toInstant())
+                ))
+                .collect(Collectors.joining("\n"));
+    }
+
+    private String prepareUnfinishedTasks(SummarizationRequest request) {
+        return request.unfinishedTasks().stream()
+                .map(task -> "- %s ___ %s ___ %s".formatted(
+                        task.header(),
+                        task.text(),
+                        task.status()
+                ))
+                .collect(Collectors.joining("\n"));
     }
 
     public String buildSystemPrompt() {
