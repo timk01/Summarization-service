@@ -1,6 +1,5 @@
 package taskplanner.summarizationservice.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,7 +45,7 @@ public class TokenService {
         return clock.millis() >= token.expiresAt() - TOKEN_EXPIRATION_GAP_MS;
     }
 
-   private TokenResponse requestTokenWithRetry() {
+    private TokenResponse requestTokenWithRetry() {
         try {
             return requestToken();
         } catch (ResourceAccessException | HttpServerErrorException exception) {
@@ -54,7 +53,7 @@ public class TokenService {
 
             return requestToken();
         }
-   }
+    }
 
     private TokenResponse requestToken() {
         TokenResponse renewToken = restClient.post()

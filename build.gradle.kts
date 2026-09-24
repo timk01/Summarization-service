@@ -34,6 +34,12 @@ dependencies {
 
     //kafka-kakaffka
     testImplementation("org.testcontainers:testcontainers-kafka")
+
+    //Tests
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-junit-jupiter")
+
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 tasks.withType<Test> {
