@@ -153,6 +153,7 @@ class TokenServiceTest {
         assertThat(first).isEqualTo(firstToken);
         assertThat(second).isEqualTo(secondToken);
 
+        assertThat(second).isNotEqualTo(first);
         verify(restClient, times(2)).post();
     }
 
