@@ -1,4 +1,4 @@
-name: Summarizarion-service CI
+name: Summarization-service CI
 
 on:
   push:
@@ -36,12 +36,12 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME_TASK_PLANNER }}
           password: ${{ secrets.DOCKERHUB_TOKEN_TASK_PLANNER }}
 
-      - name: Build and push Summarizarion-service
+      - name: Build and push Summarization-service
         uses: docker/build-push-action@v7
         with:
           context: .
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME_TASK_PLANNER }}/summarizarion-service:latest
-            ${{ secrets.DOCKERHUB_USERNAME_TASK_PLANNER }}/summarizarion-service:${{ github.sha }}
+            ${{ secrets.DOCKERHUB_USERNAME_TASK_PLANNER }}/summarization-service:latest
+            ${{ secrets.DOCKERHUB_USERNAME_TASK_PLANNER }}/summarization-service:${{ github.sha }}
