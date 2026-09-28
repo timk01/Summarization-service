@@ -33,6 +33,14 @@ Scheduler передаёт сервису данные о задачах пол�
 
 Сервис не занимается получением задач из Task Planner и не отправляет email самостоятельно.
 
+## Деплой
+
+Сервис является частью развёрнутого приложения:
+
+[http://77.221.141.215:5173](http://77.221.141.215:5173)
+
+Полный Docker Compose-стек развёрнут на VPS и включает все сервисы приложения, PostgreSQL и Kafka.
+
 ## Kafka
 
 Запросы от Scheduler поступают через Kafka-топик:
@@ -80,13 +88,31 @@ Summarization Service входит в общий Docker Compose-стек про�
 
 ## Локальная разработка
 
-Summarization Service можно запускать локально отдельно от общего Docker Compose-стека.
+Перед локальным запуском Summarization Service необходимо сначала поднять общий Docker Compose-стек из репозитория Task Planner:
 
-Для локального запуска необходимо передать `AUTH_KEY` через environment variables. Kafka при локальном запуске доступна по адресу:
+```bash
+docker compose up -d
+```
+
+После этого контейнер Summarization Service можно остановить:
+
+```bash
+docker compose stop summarization-service
+```
+
+И запустить сервис локально из IDE или через Gradle:
+
+```bash
+./gradlew bootRun
+```
+
+При локальном запуске Kafka доступна по адресу:
 
 ```text
 localhost:9094
 ```
+
+Для локального запуска также необходимо передать `AUTH_KEY` через environment variables или конфигурацию запуска IDE.
 
 ## Тесты
 
