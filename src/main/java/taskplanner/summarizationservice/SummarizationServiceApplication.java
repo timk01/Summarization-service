@@ -9,5 +9,4 @@ public class SummarizationServiceApplication {
     public static void main(String[] args) {
         SpringApplication.run(SummarizationServiceApplication.class, args);
     }
-
 }

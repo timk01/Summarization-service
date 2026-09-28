@@ -4,13 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import taskplanner.summarizationservice.dto.summarizattion.request.SummarizationRequest;
 import taskplanner.summarizationservice.dto.gigachat.request.ChatRequest;
 import taskplanner.summarizationservice.dto.gigachat.request.Content;
 import taskplanner.summarizationservice.dto.gigachat.request.Message;
+import taskplanner.summarizationservice.dto.gigachat.response.ChatResponse;
+import taskplanner.summarizationservice.dto.summarizattion.request.SummarizationRequest;
 import taskplanner.summarizationservice.dto.summarizattion.response.SummarizationResponse;
 import taskplanner.summarizationservice.dto.token.TokenResponse;
-import taskplanner.summarizationservice.dto.gigachat.response.ChatResponse;
 
 import java.util.List;
 
